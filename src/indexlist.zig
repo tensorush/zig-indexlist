@@ -1,10 +1,14 @@
+//! Index list implementation.
+
 const std = @import("std");
 
+/// Reference to list element.
 pub const Index = struct {
     generation: usize = 0,
     idx: usize = 0,
 };
 
+/// Doubly-linked list backed by an array.
 pub fn IndexList(comptime T: type) type {
     return struct {
         const Self = @This();
@@ -21,11 +25,11 @@ pub fn IndexList(comptime T: type) type {
             item: T,
         };
 
-        const Iterator = struct {
+        pub const Iterator = struct {
             list: *const Self,
             next_idx: ?usize,
 
-            fn next(self: *Iterator) ?T {
+            pub fn next(self: *Iterator) ?T {
                 const next_idx = self.next_idx orelse return null;
                 const entry = &self.list.entries.items[next_idx];
                 self.next_idx = entry.occupied.next;
@@ -39,18 +43,22 @@ pub fn IndexList(comptime T: type) type {
         head: ?usize = null,
         tail: ?usize = null,
 
+        /// Initialize backing array.
         pub fn init(allocator: std.mem.Allocator) Self {
             return .{ .entries = std.ArrayList(Entry).init(allocator) };
         }
 
+        /// Initialize backing array with capacity.
         pub fn initCapacity(allocator: std.mem.Allocator, capacity: usize) !Self {
             return .{ .entries = try std.ArrayList(Entry).initCapacity(allocator, capacity) };
         }
 
+        /// Deinitialize backing array.
         pub fn deinit(self: Self) void {
             self.entries.deinit();
         }
 
+        /// Retrieve item by index.
         pub fn get(self: Self, index: Index) ?T {
             if (index.idx < self.entries.items.len) {
                 return switch (self.entries.items[index.idx]) {
@@ -62,6 +70,7 @@ pub fn IndexList(comptime T: type) type {
             }
         }
 
+        /// Retrieve first item.
         pub fn getHead(self: Self) ?T {
             return switch (self.entries.items[self.head orelse return null]) {
                 .occupied => |entry| entry.item,
@@ -69,6 +78,7 @@ pub fn IndexList(comptime T: type) type {
             };
         }
 
+        /// Retrieve index of first item.
         pub fn getHeadIndex(self: Self) ?Index {
             const idx = self.head orelse return null;
             return switch (self.entries.items[idx]) {
@@ -77,6 +87,7 @@ pub fn IndexList(comptime T: type) type {
             };
         }
 
+        /// Retrieve index of last item.
         pub fn getTailIndex(self: Self) ?Index {
             const idx = self.tail orelse return null;
             return switch (self.entries.items[idx]) {
@@ -85,6 +96,7 @@ pub fn IndexList(comptime T: type) type {
             };
         }
 
+        /// Check if value is present among items.
         pub fn contains(self: *const Self, value: T) bool {
             var iter = self.iterator();
             while (iter.next()) |item| {
@@ -95,10 +107,12 @@ pub fn IndexList(comptime T: type) type {
             return false;
         }
 
+        /// Initialize item iterator.
         pub fn iterator(self: *const Self) Iterator {
             return .{ .list = self, .next_idx = self.head };
         }
 
+        /// Append item at the tail.
         pub fn pushBack(self: *Self, item: T) !Index {
             if (self.head == null) {
                 const generation = self.generation;
@@ -136,6 +150,7 @@ pub fn IndexList(comptime T: type) type {
             return .{ .idx = idx, .generation = self.generation };
         }
 
+        /// Append item at the head.
         pub fn pushFront(self: *Self, item: T) !Index {
             if (self.head == null) {
                 return try self.pushBack(item);
@@ -162,6 +177,7 @@ pub fn IndexList(comptime T: type) type {
             return .{ .idx = idx, .generation = self.generation };
         }
 
+        /// Retrieve following index.
         pub fn nextIndex(self: Self, index: Index) ?Index {
             if (index.idx < self.entries.items.len) {
                 return switch (self.entries.items[index.idx]) {
@@ -187,6 +203,7 @@ pub fn IndexList(comptime T: type) type {
             }
         }
 
+        /// Retrieve preceding index.
         pub fn prevIndex(self: Self, index: Index) ?Index {
             if (index.idx < self.entries.items.len) {
                 return switch (self.entries.items[index.idx]) {
@@ -212,6 +229,7 @@ pub fn IndexList(comptime T: type) type {
             }
         }
 
+        /// Remove item by index.
         pub fn remove(self: *Self, index: Index) ?T {
             const head_idx = self.head orelse return null;
             const tail_idx = self.tail orelse return null;
@@ -256,6 +274,7 @@ pub fn IndexList(comptime T: type) type {
             return removed.occupied.item;
         }
 
+        /// Insert item before another one by index.
         pub fn insertBefore(self: *Self, index: Index, item: T) !?Index {
             var prev_idx: ?usize = undefined;
             var idx: usize = undefined;
@@ -297,6 +316,7 @@ pub fn IndexList(comptime T: type) type {
             return .{ .idx = new_idx, .generation = self.generation };
         }
 
+        /// Insert item after another one by index.
         pub fn insertAfter(self: *Self, index: Index, item: T) !?Index {
             var next_idx: ?usize = undefined;
             var idx: usize = undefined;
@@ -338,6 +358,7 @@ pub fn IndexList(comptime T: type) type {
             return .{ .idx = new_idx, .generation = self.generation };
         }
 
+        /// Retrieve index of given item.
         pub fn indexOf(self: Self, item: T) ?Index {
             var next = self.head;
             while (next) |idx| {
@@ -351,6 +372,7 @@ pub fn IndexList(comptime T: type) type {
             return null;
         }
 
+        /// Remove item at the head.
         pub fn popFront(self: *Self) ?T {
             const head_idx = self.head orelse return null;
 

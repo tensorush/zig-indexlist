@@ -1,6 +1,8 @@
 ## :lizard: :card_index_dividers: **zig indexlist**
 
 [![CI][ci-shd]][ci-url]
+[![CD][cd-shd]][cd-url]
+[![DC][dc-shd]][dc-url]
 [![CC][cc-shd]][cc-url]
 [![LC][lc-shd]][lc-url]
 
@@ -48,6 +50,10 @@
 
 [ci-shd]: https://img.shields.io/github/actions/workflow/status/tensorush/zig-indexlist/ci.yaml?branch=main&style=for-the-badge&logo=github&label=CI&labelColor=black
 [ci-url]: https://github.com/tensorush/zig-indexlist/blob/main/.github/workflows/ci.yaml
+[cd-shd]: https://img.shields.io/github/actions/workflow/status/tensorush/zig-indexlist/cd.yaml?branch=main&style=for-the-badge&logo=github&label=CD&labelColor=black
+[cd-url]: https://github.com/tensorush/zig-indexlist/blob/main/.github/workflows/cd.yaml
+[dc-shd]: https://img.shields.io/badge/click-F6A516?style=for-the-badge&logo=zig&logoColor=F6A516&label=docs&labelColor=black
+[dc-url]: https://tensorush.github.io/zig-indexlist
 [cc-shd]: https://img.shields.io/codecov/c/github/tensorush/zig-indexlist?style=for-the-badge&labelColor=black
 [cc-url]: https://app.codecov.io/gh/tensorush/zig-indexlist
 [lc-shd]: https://img.shields.io/github/license/tensorush/zig-indexlist.svg?style=for-the-badge&labelColor=black
